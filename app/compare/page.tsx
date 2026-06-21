@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { formatSalary, formatDelta } from "@/lib/salary";
 import { LevelBadge } from "@/components/ui/Badge";
@@ -12,7 +12,7 @@ interface CompareResult {
   delta: CompareDelta;
 }
 
-export default function ComparePage() {
+function CompareContent() {
   const router = useRouter();
   const params = useSearchParams();
   const [s1, setS1] = useState(params.get("s1") ?? "");
@@ -143,5 +143,13 @@ export default function ComparePage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ComparePage() {
+  return (
+    <Suspense fallback={<div className="max-w-5xl mx-auto px-4 py-8 text-[#717171]">Loading...</div>}>
+      <CompareContent />
+    </Suspense>
   );
 }
