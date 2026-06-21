@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Level {
+  L3
+  L4
+  L5
+  L6
+  SDE_I
+  SDE_II
+  SDE_III
+  STAFF
+  PRINCIPAL
+  IC4
+  IC5
+}
+
+enum Currency {
+  INR
+  USD
+  GBP
+  EUR
+}
+
+enum SalarySource {
+  CONTRIBUTOR
+  SCRAPED
+  AI_INFERRED
+}
+
+enum InterviewDifficulty {
+  EASY
+  MEDIUM
+  HARD
+  VERY_HARD
+}
+
+enum InterviewOutcome {
+  OFFER
+  REJECT
+  GHOSTED
+  WITHDREW
+}
+
+model Company {
+  id                 String          @id @default(uuid())
+  name               String
+  slug               String          @unique
+  normalized_name    String
+  industry           String?
+  headquarters       String?
+  founded_year       Int?
+  headcount_range    String?
+  logo_url           String?
+  website            String?
+  funding_stage      String?
+  description        String?
+  glassdoor_rating   Decimal?        @db.Decimal(3, 1)
+  ambitionbox_rating Decimal?        @db.Decimal(3, 1)
+  talentdash_score   Decimal?        @db.Decimal(4, 2)
+  created_at         DateTime        @default(now())
+  updated_at         DateTime        @updatedAt
+  salaries           Salary[]
+  reviews            Review[]
+  interviews         Interview[]
+  workplace_score    WorkplaceScore?
+
+  @@index([normalized_name])
+  @@index([industry])
+}
+
+model Salary {
+  id                 String       @id @default(uuid())
+  company_id         String
+  company            Company      @relation(fields: [company_id], references: [id])
+  role               String
+  level              Level
+  location           String
+  currency           Currency
+  experience_years   Int
+  base_salary        BigInt
+  bonus              BigInt       @default(0)
+  stock              BigInt       @default(0)
+  total_compensation BigInt
+  source             SalarySource
+  confidence_score   Decimal      @db.Decimal(3, 2)
+  is_verified        Boolean      @default(false)
+  submitted_at       DateTime     @default(now())
+
+  @@index([company_id, level, location])
+  @@index([total_compensation])
+  @@index([submitted_at])
+  @@index([location, level])
+  @@index([role])
+}
+
+model Review {
+  id                  String   @id @default(uuid())
+  company_id          String
+  company             Company  @relation(fields: [company_id], references: [id])
+  role                String?
+  level               Level?
+  location            String?
+  rating_overall      Decimal  @db.Decimal(2, 1)
+  rating_wlb          Decimal? @db.Decimal(2, 1)
+  rating_growth       Decimal? @db.Decimal(2, 1)
+  rating_mgmt         Decimal? @db.Decimal(2, 1)
+  rating_culture      Decimal? @db.Decimal(2, 1)
+  rating_compensation Decimal? @db.Decimal(2, 1)
+  title               String
+  pros                String?
+  cons                String?
+  would_recommend     Boolean  @default(true)
+  is_anonymous        Boolean  @default(true)
+  is_verified         Boolean  @default(false)
+  submitted_at        DateTime @default(now())
+
+  @@index([company_id])
+  @@index([submitted_at])
+}
+
+model Interview {
+  id               String              @id @default(uuid())
+  company_id       String
+  company          Company             @relation(fields: [company_id], references: [id])
+  role             String
+  level            Level?
+  location         String?
+  difficulty       InterviewDifficulty
+  outcome          InterviewOutcome
+  rounds           Json?
+  tips             String?
+  years_experience Int?
+  is_verified      Boolean             @default(false)
+  submitted_at     DateTime            @default(now())
+
+  @@index([company_id])
+  @@index([role])
+}
+
+model WorkplaceScore {
+  id                 String   @id @default(uuid())
+  company_id         String   @unique
+  company            Company  @relation(fields: [company_id], references: [id])
+  score_compensation Decimal  @db.Decimal(4, 2)
+  score_wlb          Decimal  @db.Decimal(4, 2)
+  score_growth       Decimal  @db.Decimal(4, 2)
+  score_culture      Decimal  @db.Decimal(4, 2)
+  score_dei          Decimal  @db.Decimal(4, 2)
+  score_remote       Decimal  @db.Decimal(4, 2)
+  composite_score    Decimal  @db.Decimal(4, 2)
+  computed_at        DateTime @default(now())
+
+  @@index([composite_score])
+}
