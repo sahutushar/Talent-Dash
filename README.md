@@ -2,7 +2,7 @@
 
 Career intelligence platform for India's tech professionals. Real salary data, company reviews, interview experiences — structured, comparable, decision-ready.
 
-**Live URL:** https://talentdash-app.vercel.app
+**Live URL:** https://talent-dash-nzcn.vercel.app/
 
 > Built as a Full-Stack Engineering Trial. The product core: structured data → comparable → decision-ready.
 
