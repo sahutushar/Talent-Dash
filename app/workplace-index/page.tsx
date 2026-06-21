@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import React from "react";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { RatingBar } from "@/components/ui/RatingBar";
@@ -136,7 +137,7 @@ function scoreStyle(score: number) {
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
-const DIMENSIONS: { key: string; label: string; Icon: () => JSX.Element; color: string }[] = [
+const DIMENSIONS: { key: string; label: string; Icon: () => React.ReactElement; color: string }[] = [
   { key: "score_compensation", label: "Compensation", Icon: IconComp, color: "text-emerald-600" },
   { key: "score_growth",       label: "Career Growth", Icon: IconGrowth, color: "text-blue-600" },
   { key: "score_wlb",          label: "Work-Life Balance", Icon: IconWLB, color: "text-violet-600" },
